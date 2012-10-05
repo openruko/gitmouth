@@ -1,0 +1,9 @@
+*.pyc
+/include/
+/lib/
+/bin/
+/local/
+/__pycache__/
+/certs/
+local.env
+*.log
