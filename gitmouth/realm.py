@@ -11,7 +11,6 @@ class OpenRukoRealm():
 
     def requestAvatar(self, auth_payload, mind, *interfaces):
 
-        log.msg("HERE")
         api_key, key_fingerprint = auth_payload.split(':',1)
         payload = (interfaces[0], OpenRukoSession(self.settings, api_key, 
             key_fingerprint), lambda: None)

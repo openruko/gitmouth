@@ -5,7 +5,6 @@ from twisted.internet.interfaces import IPushProducer
 from zope.interface import implements
 
 class ProcLiteProtocol(Protocol):
-    implements(IPushProducer)
 
     def __init__(self):
         pass
@@ -24,15 +23,6 @@ class ProcLiteProtocol(Protocol):
             self.clientProto.errReceived(str(data)[2:])
         else:
             self.clientProto.write(data)
-
-    def pauseProducing(self):
-        self.transport.write('S:SIGSTOP\n');
-
-    def resumeProducing(self):
-        self.transport.write('S:SIGSTOP\n');
-
-    def stopProducing(self):
-        self.transport.write('S:SIGKILL\n');
 
     def connectionLost(self, reason):
         self.clientProto.processEnded(failure.Failure(ProcessDone(0)))

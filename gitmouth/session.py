@@ -109,14 +109,11 @@ class OpenRukoSession(avatar.ConchUser):
 
     def loseConnection(self):
         log.msg('lost connection')
-        pass
 
     def eofReceived(self):
         log.msg('eof fired')
-        pass
 
     def closed(self):
         log.msg('closed fired')
         if self.rez:
             self.rez.loseConnection()
-        pass

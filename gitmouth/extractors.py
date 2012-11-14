@@ -17,14 +17,12 @@ class BuildServerExtractor(Protocol):
 
 class UserExtractor(Protocol):
     def __init__(self, finished, key_fingerprint, credentials):
-        log.msg('data received')
         self.finished = finished
         self.credentials = credentials
         self.collected = ''
         self.key_fingerprint = key_fingerprint
 
     def dataReceived(self, bytes):
-        log.msg('data received')
         self.collected += bytes
 
     def connectionLost(self, reason):
