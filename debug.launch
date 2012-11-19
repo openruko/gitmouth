@@ -7,13 +7,13 @@ if [ -e bin/activate ]; then
   source bin/activate
 else
   echo "virtualenv not detected. we recommend virtualenv!" >&2
-fi 
+fi
 
 export PORT=2222
-export PROCLITE_PORT=4000
-export API_SERVER_BASE_URL=http://localhost:5000
-export API_SERVER_KEY=aaa-bbb-ccc-ddd-eee
-export PRIVATE_KEY=certs/server.key
-export PUBLIC_KEY=certs/server.key.pub
+export PROCLITE_PORT=${PROCLITE_PORT:-4000}
+export API_SERVER_BASE_URL=${API_SERVER_BASE_URL:-http://localhost:5000}
+export API_SERVER_KEY=${API_SERVER_KEY:-aaa-bbb-ccc-ddd-eee}
+export PRIVATE_KEY=${PRIVATE_KEY:-certs/server.key}
+export PUBLIC_KEY=${PUBLIC_KEY:-certs/server.key.pub}
 
 exec gitmouth/bin/gitmouth
