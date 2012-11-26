@@ -24,8 +24,10 @@ class OpenRukoCredentialChecker(SSHPublicKeyDatabase):
 
          cmp_key = Key.fromString(credentials.blob).fingerprint().replace(':','');
 
-         lookup_url = (self.settings.get('api_server_base_url') + 
-            '/internal/lookupUserByPublicKey?fingerprint=' + cmp_key)
+         apiserver_base_url = self.settings.get('apiserver_protocol') + '://' + self.settings.get('apiserver_hostname') + ':' + self.settings.get('apiserver_port') + '/'
+
+         lookup_url = ( apiserver_base_url +
+            'internal/lookupUserByPublicKey?fingerprint=' + cmp_key)
 
          log.msg("Checking fingerprint: " + lookup_url)
 
@@ -45,7 +47,7 @@ class OpenRukoCredentialChecker(SSHPublicKeyDatabase):
          req=self.agent.request('GET',lookup_url,
                  headers=Headers({ 'Authorization': [' Basic ' + 
                      base64.b64encode(':' + 
-                         self.settings.get('api_server_key'))]}))
+                         self.settings.get('apiserver_key'))]}))
          req.addCallback(cbResponse)
          req.addErrback(cbErrResponse)
          return d;

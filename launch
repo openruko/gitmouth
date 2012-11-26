@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# example debug launch, use ports > 1024 to avoid superuser requirement
+
+# activate virtualenv environment
+if [ -e bin/activate ]; then
+  source bin/activate
+else
+  echo "virtualenv not detected. we recommend virtualenv!" >&2
+fi
+
+exec gitmouth/bin/gitmouth

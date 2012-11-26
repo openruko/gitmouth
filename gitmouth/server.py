@@ -17,5 +17,5 @@ class OpenRukoSSHServer(SSHFactory):
         self.settings = settings
         self.portal = Portal(OpenRukoRealm(settings))
         self.portal.registerChecker(OpenRukoCredentialChecker(settings))
-        self.privateKeys = {'ssh-rsa': Key.fromFile(settings['private_key'])}
-        self.publicKeys = {'ssh-rsa': Key.fromFile(settings['public_key'])}
+        self.privateKeys = {'ssh-rsa': Key.fromFile(settings['gitmouth_private_key'])}
+        self.publicKeys = {'ssh-rsa': Key.fromFile(settings['gitmouth_public_key'])}

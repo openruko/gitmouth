@@ -63,7 +63,7 @@ class OpenRukoSession(avatar.ConchUser):
         def buildProtoCallback(dyno_id):
             def setupProto(remoteProto):
                 self.rez = remoteProto
-                remoteProto.write(self.settings['api_server_key'] + '\n')
+                remoteProto.write(self.settings['apiserver_key'] + '\n')
                 remoteProto.write(dyno_id + '\n')
                 proto.makeConnection(remoteProto)
                 remoteProto.pair(proto)
@@ -73,7 +73,7 @@ class OpenRukoSession(avatar.ConchUser):
             dyno_id=rez_info.get('dyno_id')
             cc=ClientCreator(reactor, ProcLiteProtocol)
             (cc.connectSSL(rez_info.get('host'),
-                self.settings.get('proclite_port'), ssl.ClientContextFactory()).
+                self.settings.get('dynohost_rendezvous_port'), ssl.ClientContextFactory()).
             addCallback(buildProtoCallback(dyno_id)))
 
         d = defer.Deferred()
@@ -90,8 +90,10 @@ class OpenRukoSession(avatar.ConchUser):
             proto.errReceived('\n ! Unable to contact build server.\n\n')
             return proto.processEnded(failure.Failure(ProcessTerminated(exitCode=127)))
 
+        apiserver_base_url = self.settings.get('apiserver_protocol') + '://' + self.settings.get('apiserver_hostname') + ':' + self.settings.get('apiserver_port') + '/'
+
         req=self.agent.request('POST', 
-                (self.settings['api_server_base_url'] + '/internal/' 
+                (apiserver_base_url + 'internal/' 
                     + app_name + '/gitaction?command=' + app_command),
                 Headers({ 'Authorization': 
                     [' Basic ' + base64.b64encode(':' + self.api_key)] }))

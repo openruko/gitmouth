@@ -1,1 +1,1 @@
-worker: PORT=$PORT ./gitmouth/bin/gitmouth
+gitmouth: ./launch
