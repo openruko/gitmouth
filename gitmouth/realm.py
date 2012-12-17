@@ -1,7 +1,7 @@
 from twisted.cred.portal import IRealm
 from zope.interface import implements
 
-from session import OpenRukoSession
+from .session import OpenRukoSession
 
 
 class OpenRukoRealm():

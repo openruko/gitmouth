@@ -1,7 +1,7 @@
 .PHONY: init certs
 
 init:
-	bash -c 'source bin/activate; pip install -r requirements.txt'
+	bash -c 'source bin/activate; python setup.py develop'
 	@echo "Optionally run make certs to generate test certs"
 
 certs:

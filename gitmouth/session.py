@@ -11,8 +11,8 @@ from twisted.internet.error import ProcessTerminated
 from twisted.web.http_headers import Headers
 from twisted.internet.protocol import ClientCreator
 
-from protocol import ProcLiteProtocol, DumbProtocol
-from extractors import BuildServerExtractor
+from .protocol import ProcLiteProtocol, DumbProtocol
+from .extractors import BuildServerExtractor
 
 APP_NAME_RE = re.compile(r"^'/*(?P<app_name>[a-zA-Z0-9][a-zA-Z0-9@_-]*).git'$")
 

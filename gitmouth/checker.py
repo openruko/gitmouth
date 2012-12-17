@@ -7,7 +7,7 @@ from twisted.web.client import Agent
 from twisted.web.http_headers import Headers
 from twisted.conch.ssh.keys import Key
 
-from extractors import UserExtractor
+from .extractors import UserExtractor
 
 
 class OpenRukoCredentialChecker(SSHPublicKeyDatabase):

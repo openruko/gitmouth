@@ -5,8 +5,8 @@ from twisted.conch.ssh.keys import Key
 from twisted.cred.portal import Portal
 from twisted.python import log
 
-from realm import OpenRukoRealm
-from checker import OpenRukoCredentialChecker
+from .realm import OpenRukoRealm
+from .checker import OpenRukoCredentialChecker
 
 log.startLogging(sys.stderr)
 
