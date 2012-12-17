@@ -1,22 +1,20 @@
-from twisted.internet import reactor, defer, error, ssl
-from twisted.cred.portal import Portal, IRealm
+import base64
+import re
+
+from twisted.internet import reactor, defer, ssl
 from twisted.python import log, failure
-from twisted.conch.ssh import keys, session
-from twisted.conch import avatar 
+from twisted.conch.ssh import session
+from twisted.conch import avatar
 from zope.interface import implements
-from twisted.internet.protocol import ClientFactory, Protocol, ProcessProtocol, Factory
-from twisted.cred.portal import Portal, IRealm
 from twisted.web.client import Agent
-from twisted.internet.error import ProcessDone, ProcessTerminated
+from twisted.internet.error import ProcessTerminated
 from twisted.web.http_headers import Headers
 from twisted.internet.protocol import ClientCreator
-import os
-import base64 
-import json
-import re
 
 from protocol import ProcLiteProtocol, DumbProtocol
 from extractors import BuildServerExtractor
+
+APP_NAME_RE = re.compile(r"^'/*(?P<app_name>[a-zA-Z0-9][a-zA-Z0-9@_-]*).git'$")
 
 
 class OpenRukoSession(avatar.ConchUser):
@@ -28,8 +26,8 @@ class OpenRukoSession(avatar.ConchUser):
         self.api_key = api_key
         self.key_fingerprint = key_fingerprint
         self.settings = settings
-        self.channelLookup.update({'session': session.SSHSession });
-        self.app_name_regex = re.compile("^'/*(?P<app_name>[a-zA-Z0-9][a-zA-Z0-9@_-]*).git'$")
+        self.channelLookup.update({'session': session.SSHSession})
+        self.app_name_regex = APP_NAME_RE
         self.rez = None
 
     def execCommand(self, proto, cmd):
@@ -37,9 +35,11 @@ class OpenRukoSession(avatar.ConchUser):
         proto.makeConnection(DumbProtocol())
 
         def return_path_error():
-            proto.errReceived('\n ! Invalid path.');
-            proto.errReceived('\n ! Syntax is: git@heroku.com:<app>.git where <app> is your app\'s name.\n\n');
-            return proto.processEnded(failure.Failure(ProcessTerminated(exitCode=1)))
+            proto.errReceived('\n ! Invalid path.')
+            proto.errReceived('\n ! Syntax is: git@heroku.com:<app>.git where '
+                              '<app> is your app\'s name.\n\n')
+            reason = failure.Failure(ProcessTerminated(exitCode=1))
+            return proto.processEnded(reason)
 
         if not cmd:
             return return_path_error()
@@ -47,17 +47,17 @@ class OpenRukoSession(avatar.ConchUser):
         cmd_parts = cmd.split(' ')
 
         if len(cmd_parts) != 2:
-            return return_path_error();
+            return return_path_error()
 
         app_command = cmd_parts[0]
-        if app_command != 'git-receive-pack' and app_command != 'git-upload-pack':
+        if app_command not in ['git-receive-pack', 'git-upload-pack']:
             return return_path_error()
 
         app_name_raw = cmd_parts[1]
         name_match = self.app_name_regex.match(app_name_raw)
         if name_match is None:
             return return_path_error()
-        
+
         app_name = name_match.group('app_name')
 
         def buildProtoCallback(dyno_id):
@@ -70,34 +70,42 @@ class OpenRukoSession(avatar.ConchUser):
             return setupProto
 
         def connect_to_rez(rez_info):
-            dyno_id=rez_info.get('dyno_id')
-            cc=ClientCreator(reactor, ProcLiteProtocol)
+            dyno_id = rez_info.get('dyno_id')
+            cc = ClientCreator(reactor, ProcLiteProtocol)
             (cc.connectSSL(rez_info.get('host'),
-                self.settings.get('dynohost_rendezvous_port'), ssl.ClientContextFactory()).
-            addCallback(buildProtoCallback(dyno_id)))
+                           self.settings['dynohost_rendezvous_port'],
+                           ssl.ClientContextFactory()).
+             addCallback(buildProtoCallback(dyno_id)))
 
         d = defer.Deferred()
         d.addCallback(connect_to_rez)
 
         def cbErrResponse(err):
             proto.errReceived('\n ! Unable to contact build server.\n\n')
-            return proto.processEnded(failure.Failure(ProcessTerminated(exitCode=127)))
+            reason = failure.Failure(ProcessTerminated(exitCode=127))
+            return proto.processEnded(reason)
 
         def cbResponse(resp):
-           if resp.code == 200:
-               resp.deliverBody(BuildServerExtractor(d))
-           else:
-            proto.errReceived('\n ! Unable to contact build server.\n\n')
-            return proto.processEnded(failure.Failure(ProcessTerminated(exitCode=127)))
+            if resp.code == 200:
+                resp.deliverBody(BuildServerExtractor(d))
+            else:
+                proto.errReceived('\n ! Unable to contact build server.\n\n')
+                reason = failure.Failure(ProcessTerminated(exitCode=127))
+                return proto.processEnded(reason)
 
-        apiserver_base_url = self.settings.get('apiserver_protocol') + '://' + self.settings.get('apiserver_hostname') + ':' + self.settings.get('apiserver_port') + '/'
+        url = '%s://%s:%d/internal/%s/gitaction?command=%s' % (
+            self.settings['apiserver_protocol'],
+            self.settings['apiserver_hostname'],
+            self.settings['apiserver_port'],
+            app_name,
+            app_command
+        )
+        auth_key = base64.b64encode(':' + self.api_key)
+        headers = Headers({
+            'Authorization': [' Basic %' % auth_key]
+        })
 
-        req=self.agent.request('POST', 
-                (apiserver_base_url + 'internal/' 
-                    + app_name + '/gitaction?command=' + app_command),
-                Headers({ 'Authorization': 
-                    [' Basic ' + base64.b64encode(':' + self.api_key)] }))
-
+        req = self.agent.request('POST', url, headers)
         req.addCallback(cbResponse)
         req.addErrback(cbErrResponse)
 

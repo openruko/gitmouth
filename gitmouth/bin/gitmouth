@@ -2,9 +2,11 @@
 
 import os
 import sys
-from twisted.internet import reactor, defer, error, ssl
 
-parent_path=os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)) , '..'))
+from twisted.internet import reactor
+
+parent_path = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 sys.path.append(parent_path)
 
 from server import OpenRukoSSHServer
@@ -14,21 +16,26 @@ env_keys = ['APISERVER_KEY']
 
 for env_key in env_keys:
     if not os.environ.get(env_key, None):
-        print "%s environment variables not found. Consult README.md" % (env_key, )
+        print "%s environment variables not found. Consult README.md" % (
+            env_key, )
         exit(1)
 
 # build settings object
-settings=dict()
-settings['gitmouth_port'] = int(os.environ.get('GITMOUTH_PORT', 2222))
-settings['gitmouth_private_key'] = os.environ.get('GITMOUTH_PRIVATE_KEY', 'certs/server.key')
-settings['gitmouth_public_key'] = os.environ.get('GITMOUTH_PUBLIC_KEY', 'certs/server.key.pub')
-settings['dynohost_rendezvous_port'] = int(os.environ.get('DYNOHOST_RENDEZVOUS_PORT', 4000))
-settings['apiserver_protocol'] = os.environ.get('APISERVER_PROTOCOL', 'http')
-settings['apiserver_hostname'] = os.environ.get('APISERVER_HOSTNAME', 'localhost')
-settings['apiserver_port'] = os.environ.get('APISERVER_PORT', '5000')
-settings['apiserver_key'] = os.environ.get('APISERVER_KEY')
+settings = {
+    'gitmouth_port': int(os.environ.get('GITMOUTH_PORT', 2222)),
+    'gitmouth_private_key': os.environ.get('GITMOUTH_PRIVATE_KEY',
+                                           'certs/server.key'),
+    'gitmouth_public_key': os.environ.get('GITMOUTH_PUBLIC_KEY',
+                                          'certs/server.key.pub'),
+    'dynohost_rendezvous_port': int(os.environ.get('DYNOHOST_RENDEZVOUS_PORT',
+                                                   4000)),
+    'apiserver_protocol': os.environ.get('APISERVER_PROTOCOL', 'http'),
+    'apiserver_hostname': os.environ.get('APISERVER_HOSTNAME', 'localhost'),
+    'apiserver_port': os.environ.get('APISERVER_PORT', '5000'),
+    'apiserver_key': os.environ.get('APISERVER_KEY'),
+}
 
 # launch ssh server
-server=OpenRukoSSHServer(settings)
+server = OpenRukoSSHServer(settings)
 reactor.listenTCP(settings.get('gitmouth_port'), server)
 reactor.run()

@@ -1,8 +1,7 @@
 from twisted.internet.protocol import Protocol
-from twisted.python import log, failure
-from twisted.internet.error import ProcessDone, ProcessTerminated
-from twisted.internet.interfaces import IPushProducer
-from zope.interface import implements
+from twisted.python import failure
+from twisted.internet.error import ProcessDone
+
 
 class ProcLiteProtocol(Protocol):
 
@@ -13,7 +12,7 @@ class ProcLiteProtocol(Protocol):
         pass
 
     def write(self, data):
-        self.transport.write(data);
+        self.transport.write(data)
 
     def pair(self, clientProto):
         self.clientProto = clientProto
@@ -29,6 +28,7 @@ class ProcLiteProtocol(Protocol):
 
     def loseConnection(self):
         self.transport.abortConnection()
+
 
 class DumbProtocol(Protocol):
 
