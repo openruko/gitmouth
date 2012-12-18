@@ -58,10 +58,11 @@ supervisord or as part of boot script see `./gitmouth/bin/gitmouth`
 ## Launch
 
     $ cat > .env << EOF
+    VENV_PATH=.
     PYTHONUNBUFFERED=true
     APISERVER_KEY=$WHAT_WAS_WRITTEN_AT_THE_END_OF_APISERVER_SETUP
     EOF
-    $ make run
+    $ foreman start
 
 
 ## Help and Todo

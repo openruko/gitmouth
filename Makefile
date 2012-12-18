@@ -9,6 +9,3 @@ certs:
 	@echo "Do not use a passphrase for temporary certs"
 	ssh-keygen -t rsa -f certs/server.key
 	@echo "Temporary certs have been setup in certs/ directory"
-
-run:
-	bash -c 'source bin/activate && foreman start'
