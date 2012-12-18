@@ -1,1 +1,1 @@
-gitmouth: ./launch
+service: gitmouth

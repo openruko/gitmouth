@@ -1,7 +1,7 @@
 .PHONY: init certs
 
 init:
-	bash -c 'source bin/activate; python setup.py develop'
+	bash -c 'virtualenv --distribute . && source bin/activate && python setup.py develop'
 	@echo "Optionally run make certs to generate test certs"
 
 certs:
@@ -10,3 +10,5 @@ certs:
 	ssh-keygen -t rsa -f certs/server.key
 	@echo "Temporary certs have been setup in certs/ directory"
 
+run:
+	bash -c 'source bin/activate && foreman start'
