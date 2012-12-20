@@ -1,1 +1,1 @@
-service: $VENV_PATH/bin/gitmouth
+gitmouth: ./bin/gitmouth
