@@ -102,7 +102,7 @@ class OpenRukoSession(avatar.ConchUser):
         )
         auth_key = base64.b64encode(':' + self.api_key)
         headers = Headers({
-            'Authorization': [' Basic %' % auth_key]
+            'Authorization': [' Basic %s' % auth_key]
         })
 
         req = self.agent.request('POST', url, headers)
