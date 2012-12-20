@@ -26,7 +26,7 @@ settings = {
                                                    4000)),
     'apiserver_protocol': os.environ.get('APISERVER_PROTOCOL', 'http'),
     'apiserver_hostname': os.environ.get('APISERVER_HOSTNAME', 'localhost'),
-    'apiserver_port': os.environ.get('APISERVER_PORT', '5000'),
+    'apiserver_port': int(os.environ.get('APISERVER_PORT', 5000)),
     'apiserver_key': os.environ.get('APISERVER_KEY'),
 }
 
