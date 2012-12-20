@@ -1,1 +1,1 @@
-gitmouth: ./launch
+gitmouth: ./bin/gitmouth

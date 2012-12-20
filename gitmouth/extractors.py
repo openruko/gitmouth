@@ -1,6 +1,7 @@
-from twisted.internet.protocol import Protocol
-from twisted.python import log, failure
 import json
+
+from twisted.internet.protocol import Protocol
+
 
 class BuildServerExtractor(Protocol):
     def __init__(self, finished):
@@ -26,6 +27,6 @@ class UserExtractor(Protocol):
         self.collected += bytes
 
     def connectionLost(self, reason):
-        parts=self.collected.split(':')
-        self.credentials.username = parts[1] + ':' + self.key_fingerprint 
+        parts = self.collected.split(':')
+        self.credentials.username = '%s:%s' % (parts[1], self.key_fingerprint)
         self.finished.callback(True)
